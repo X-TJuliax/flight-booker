@@ -1,0 +1,88 @@
+<h1>Confirm Passenger Information</h1>
+
+<%= form_with model: @booking, local: true do |f| %>
+  <h2>Booking Information</h2>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Airline Company</th>
+        <th>Start Time</th>
+        <th>Duration</th>
+        <th>Departure</th>
+        <th>Destination</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><%= @flight.name %></td>
+        <td><%= @flight.airline_company %></td>
+        <td><%= @flight.start_time %></td>
+        <td><%= @flight.duration %> hours</td>
+        <td><%= @flight.departure_flight.code %></td>
+        <td><%= @flight.arrival_flight.code %></td>    
+      </tr>
+    </tbody>
+  </table>
+
+  <%= f.hidden_field :flight_id %>
+
+  <h2>Passengers</h2>
+
+  <div id="passenger_fields">
+    <%= f.fields_for :passengers do |p| %>
+      <div class="passenger-fields">
+        <div class="field">
+          <%= p.label :name %>
+          <%= p.text_field :name %>
+        </div>
+
+        <div class="field">
+          <%= p.label :email %>
+          <%= p.email_field :email %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%= link_to 'Add Passenger', '#', id: 'add-passenger' %>
+
+  <div class="actions">
+    <%= f.submit "Complete Booking" %>
+  </div>
+<% end %>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const passengerFields = document.querySelector("#passenger_fields");
+    const addPassengerLink = document.querySelector("#add-passenger");
+
+    addPassengerLink.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      const newFields = document.createElement('div');
+      newFields.classList.add('passenger-fields');
+      newFields.innerHTML = `
+        <div class="field">
+          <label for="booking_passengers_attributes_new_name">Name</label>
+          <input type="text" name="booking[passengers_attributes][new][name]" id="booking_passengers_attributes_new_name">
+        </div>
+        <div class="field">
+          <label for="booking_passengers_attributes_new_email">Email</label>
+          <input type="email" name="booking[passengers_attributes][new][email]" id="booking_passengers_attributes_new_email">
+        </div>
+      `;
+
+      passengerFields.appendChild(newFields);
+
+      // Update the input names with a unique index
+      passengerFields.querySelectorAll('.passenger-fields').forEach((field, index) => {
+        field.querySelectorAll('input').forEach(input => {
+          input.name = input.name.replace('new', index);
+          input.id = input.id.replace('new', index);
+        });
+      });
+    });
+  });
+</script>
